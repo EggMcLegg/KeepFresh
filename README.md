@@ -25,7 +25,7 @@ Validation ensures proper input.
 - Insert Food using Barcode Scanner and Food API 
 - Edit and delete food item
 - Update Used Item
-- Food Waste Ananlysis
+- Food Waste Analysis
 - Develop App Icon
 
 ## Dependencies
@@ -33,6 +33,6 @@ Validation ensures proper input.
 - Room Database
 
 ## Acknowledgements
-- The code is inspired from the provided lecture notes and assignmnets of CMPT 362 at Simon Fraser Universtiy
+- The code is inspired by provided lecture notes and assignments of CMPT 362 at Simon Fraser University
 - Icon images are from FatIcon (https://www.faticons.com/)
 
