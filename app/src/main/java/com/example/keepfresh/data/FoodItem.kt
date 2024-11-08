@@ -17,12 +17,16 @@ data class FoodItem (
 
     @ColumnInfo(name = "food_photo_uri")
     private var foodPhotoUri: String = "",
+
+    @ColumnInfo(name = "last_notified")
+    private var lastNotified: Long = 0L,
 ){
     // Getters
     fun getId(): Long = id
     fun getFoodName(): String = foodName
     fun getExpirationDate(): Long = expirationDate
     fun getFoodPhotoUri(): String = foodPhotoUri
+    fun getLastNotified(): Long = lastNotified
 
     // Setters
     fun setId(id: Long) {
@@ -39,6 +43,10 @@ data class FoodItem (
 
     fun setFoodPhotoUri(foodPhotoUri: String){
         this.foodPhotoUri = foodPhotoUri
+    }
+
+    fun setLastNotified(lastNotified: Long){
+        this.lastNotified = lastNotified
     }
 
 }

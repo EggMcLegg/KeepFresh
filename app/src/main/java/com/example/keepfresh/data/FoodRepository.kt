@@ -1,5 +1,6 @@
 package com.example.keepfresh.data
 
+import androidx.lifecycle.LiveData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.flow.Flow
@@ -18,5 +19,10 @@ class FoodRepository (private val foodDatabaseDao: FoodDatabaseDao) {
         CoroutineScope(IO).launch {
             foodDatabaseDao.delete(foodItem)
         }
+    }
+
+    fun getExpiringItemsSoon(daysLater: Long): LiveData<List<FoodItem>> {
+        val today = System.currentTimeMillis()
+        return foodDatabaseDao.getItemsExpiringSoon(today, daysLater)
     }
 }
