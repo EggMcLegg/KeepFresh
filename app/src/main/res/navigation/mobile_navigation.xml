@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/nav_input">
+
+    <fragment
+        android:id="@+id/nav_input"
+        android:name="com.example.keepfresh.ui.foodInput.FoodInputFragment"
+        android:label="@string/menu_input"
+        tools:layout="@layout/fragment_input" />
+
+    <fragment
+        android:id="@+id/nav_inventory"
+        android:name="com.example.keepfresh.ui.foodInventory.FoodInventoryFragment"
+        android:label="@string/menu_inventory"
+        tools:layout="@layout/fragment_inventory" />
+
+    <fragment
+        android:id="@+id/nav_preference"
+        android:name="com.example.keepfresh.ui.preference.PreferenceFragment"
+        android:label="@string/menu_preference"
+        tools:layout="layout/fragment_preference"/>
+</navigation>
