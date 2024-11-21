@@ -54,11 +54,9 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 
-    val room_version = "2.6.0"
-    val lifecycle_version = "2.6.2"
-    implementation("androidx.room:room-ktx:$room_version")
-    kapt("androidx.room:room-compiler:$room_version")
-    implementation ("androidx.lifecycle:lifecycle-livedata-ktx: $lifecycle_version")
+    implementation(libs.androidx.room.ktx)
+    kapt(libs.androidx.room.compiler)
+    implementation (libs.androidx.lifecycle.livedata.ktx.v262)
 
-    implementation ("com.squareup.picasso:picasso:2.8")
+    implementation (libs.picasso)
 }
