@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.asLiveData
 import com.example.keepfresh.data.FoodItem
 import com.example.keepfresh.data.FoodRepository
-import com.example.keepfresh.ui.foodInput.FoodInputViewModel
 import java.lang.IllegalArgumentException
 
 class FoodInventoryViewModel(private val repository: FoodRepository) : ViewModel() {

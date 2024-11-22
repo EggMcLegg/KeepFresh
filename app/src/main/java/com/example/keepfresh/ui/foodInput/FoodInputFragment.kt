@@ -5,30 +5,25 @@ import android.app.DatePickerDialog
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.DatePicker
+import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import android.widget.Toast
-import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.keepfresh.Util
+import com.example.keepfresh.Util.ImagePickerHelper
+import com.example.keepfresh.Util.ImagePickerHelper.ImageSource
 import com.example.keepfresh.databinding.FragmentInputBinding
 import com.example.keepfresh.data.FoodDatabase
 import com.example.keepfresh.data.FoodDatabaseDao
 import com.example.keepfresh.data.FoodItem
 import com.example.keepfresh.data.FoodRepository
-import java.io.File
-import java.io.IOException
-import java.text.SimpleDateFormat
 import java.util.Calendar
-import java.util.Date
-import java.util.Locale
 
 class FoodInputFragment : Fragment(), FoodPhotoDialogFragment.FoodPhotoListener, DatePickerDialog.OnDateSetListener {
 
@@ -42,12 +37,9 @@ class FoodInputFragment : Fragment(), FoodPhotoDialogFragment.FoodPhotoListener,
     private lateinit var foodInputViewModel: FoodInputViewModel
 
     private lateinit var photoResultLauncher: ActivityResultLauncher<Intent>
-    private var photoUri: Uri? = null
-
     private val calendar = Calendar.getInstance()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-
         database = FoodDatabase.getInstance(requireContext())
         databaseDao = database.foodDatabaseDao
         repository = FoodRepository(databaseDao)
@@ -63,7 +55,7 @@ class FoodInputFragment : Fragment(), FoodPhotoDialogFragment.FoodPhotoListener,
         return root
     }
 
-    private fun setupUI(){
+    private fun setupUI() {
         binding.btnChangePhoto.setOnClickListener {
             Util.checkPermissions(requireActivity())
             val dialog = FoodPhotoDialogFragment()
@@ -72,12 +64,7 @@ class FoodInputFragment : Fragment(), FoodPhotoDialogFragment.FoodPhotoListener,
         }
 
         binding.inputExpirationDate.setOnClickListener {
-            val datePickerDialog = DatePickerDialog(
-                requireContext(), this,calendar.get(Calendar.YEAR),
-                calendar.get(Calendar.MONTH),
-                calendar.get(Calendar.DAY_OF_MONTH)
-            )
-            datePickerDialog.show()
+            Util.showDatePicker(requireContext(), binding.inputExpirationDate, calendar)
         }
 
         binding.btnSave.setOnClickListener {
@@ -89,9 +76,10 @@ class FoodInputFragment : Fragment(), FoodPhotoDialogFragment.FoodPhotoListener,
         }
     }
 
-    private fun saveFoodItem(){
+    private fun saveFoodItem() {
         val foodName = binding.inputFoodName.text.toString()
         val expirationDate = calendar.timeInMillis
+        val photoUri = ImagePickerHelper.getPhotoUri()
 
         if (foodName.isNotBlank() && photoUri != null) {
             val foodItem = FoodItem(
@@ -107,25 +95,17 @@ class FoodInputFragment : Fragment(), FoodPhotoDialogFragment.FoodPhotoListener,
         }
     }
 
-    private fun clearInputs(){
+    private fun clearInputs() {
         binding.inputFoodName.text?.clear()
         binding.inputExpirationDate.text?.clear()
         binding.photoFood.setImageURI(null)
-        photoUri = null
+        ImagePickerHelper.getPhotoUri()?.let { Uri.EMPTY }
     }
 
-    // Display Date from User Input
-    override fun onDateSet(view: DatePicker, year: Int, month: Int, dayOfMonth: Int) {
-        val selectedDate = "${year}/${month + 1}/$dayOfMonth"
-        binding.inputExpirationDate.setText(selectedDate)
-        calendar.set(year, month, dayOfMonth)
-    }
-
-    // Implement FoodPhotoListeners methods
-    private fun setupPhotoResultLauncher(){
+    private fun setupPhotoResultLauncher() {
         photoResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
             if (result.resultCode == Activity.RESULT_OK) {
-                binding.photoFood.setImageURI(photoUri)
+                binding.photoFood.setImageURI(ImagePickerHelper.getPhotoUri())
             } else {
                 Toast.makeText(requireContext(), "Failed to select or capture image", Toast.LENGTH_SHORT).show()
             }
@@ -133,43 +113,17 @@ class FoodInputFragment : Fragment(), FoodPhotoDialogFragment.FoodPhotoListener,
     }
 
     override fun onCameraSelected() {
-        launchImageSelection(ImageSource.CAMERA)
+        ImagePickerHelper.launchImageSelection(requireContext(), ImageSource.CAMERA, photoResultLauncher)
     }
 
     override fun onGallerySelected() {
-        launchImageSelection(ImageSource.GALLERY)
+        ImagePickerHelper.launchImageSelection(requireContext(), ImageSource.GALLERY, photoResultLauncher)
     }
 
-    private fun launchImageSelection(source: ImageSource){
-        val intent = when (source) {
-            ImageSource.GALLERY -> Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-            ImageSource.CAMERA -> {
-                val photoFile = try {
-                    createImageFile()
-                } catch (ex: IOException) {
-                    Toast.makeText(requireContext(), "Error creating file", Toast.LENGTH_SHORT).show()
-                    null
-                }
-                photoFile?.let {
-                    photoUri = FileProvider.getUriForFile(requireContext(), "com.example.keepfresh.provider", photoFile)
-                    Intent(MediaStore.ACTION_IMAGE_CAPTURE).apply {
-                        putExtra(MediaStore.EXTRA_OUTPUT, photoUri)
-                    }
-                }
-            }
-        }
-        intent?.let { photoResultLauncher.launch(it) }
-    }
-
-    @Throws(IOException::class)
-    private fun createImageFile(): File {
-        val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
-        val storageDir: File = requireActivity().getExternalFilesDir(null)!!
-        return File.createTempFile("JPEG_${timeStamp}_", ".jpg", storageDir)
-    }
-
-    private enum class ImageSource{
-        GALLERY, CAMERA
+    override fun onDateSet(view: DatePicker, year: Int, month: Int, dayOfMonth: Int) {
+        val selectedDate = "${year}/${month + 1}/$dayOfMonth"
+        binding.inputExpirationDate.setText(selectedDate)
+        calendar.set(year, month, dayOfMonth)
     }
 
     override fun onDestroyView() {

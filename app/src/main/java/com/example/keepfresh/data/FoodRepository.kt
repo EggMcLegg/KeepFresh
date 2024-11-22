@@ -8,6 +8,7 @@ import kotlinx.coroutines.launch
 
 class FoodRepository (private val foodDatabaseDao: FoodDatabaseDao) {
     val allFoodItems: Flow<List<FoodItem>> = foodDatabaseDao.getAllItems()
+    fun getFoodItemById(id: Long): LiveData<FoodItem> = foodDatabaseDao.getFoodItemById(id)
 
     fun insert(foodItem: FoodItem){
         CoroutineScope(IO).launch{
@@ -15,14 +16,20 @@ class FoodRepository (private val foodDatabaseDao: FoodDatabaseDao) {
         }
     }
 
-    fun delete(foodItem: FoodItem){
+    fun deleteFoodItemById(foodId: Long){
         CoroutineScope(IO).launch {
-            foodDatabaseDao.delete(foodItem)
+            foodDatabaseDao.deleteFoodItemById(foodId)
         }
     }
 
     fun getExpiringItemsSoon(daysLater: Long): LiveData<List<FoodItem>> {
         val today = System.currentTimeMillis()
         return foodDatabaseDao.getItemsExpiringSoon(today, daysLater)
+    }
+
+    fun update(foodItem: FoodItem ) {
+        CoroutineScope(IO).launch {
+            foodDatabaseDao.updateItem(foodItem)
+        }
     }
 }

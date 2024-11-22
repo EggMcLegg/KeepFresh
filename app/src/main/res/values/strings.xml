@@ -22,4 +22,6 @@
         <item>Months</item>
         <item>Years</item>
     </string-array>
+
+    <string name="btn_delete">DELETE</string>
 </resources>

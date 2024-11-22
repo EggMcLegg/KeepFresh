@@ -22,7 +22,6 @@ class FoodInventoryFragment : Fragment() {
     private lateinit var repository: FoodRepository
     private lateinit var viewModelFactory: FoodInventoryViewModelFactory
     private lateinit var foodInventoryViewModel: FoodInventoryViewModel
-    private lateinit var foodInventoryAdapter: FoodInventoryAdapter
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
 

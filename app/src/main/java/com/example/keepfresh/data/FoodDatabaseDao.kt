@@ -16,9 +16,6 @@ interface FoodDatabaseDao {
     @Query("SELECT * FROM food_items_table")
     fun getAllItems(): Flow<List<FoodItem>>
 
-    @Delete
-    suspend fun delete(foodItem: FoodItem)
-
     @Query("""
         SELECT * FROM food_items_table 
         WHERE expiration_date  <= :daysLater 
@@ -30,4 +27,10 @@ interface FoodDatabaseDao {
     // Update the item to mark that it has been notified
     @Update
     suspend fun updateItem(item: FoodItem)
+
+    @Query("SELECT * FROM food_items_table WHERE id = :id")
+    fun getFoodItemById(id: Long): LiveData<FoodItem>
+
+    @Query("DELETE FROM food_items_table WHERE id = :foodId")
+    suspend fun deleteFoodItemById(foodId: Long)
 }

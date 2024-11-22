@@ -15,11 +15,26 @@
         android:id="@+id/nav_inventory"
         android:name="com.example.keepfresh.ui.foodInventory.FoodInventoryFragment"
         android:label="@string/menu_inventory"
-        tools:layout="@layout/fragment_inventory" />
+        tools:layout="@layout/fragment_inventory">
+
+        <action
+            android:id="@+id/action_foodInventoryFragment_to_foodDetailFragment"
+            app:destination="@id/foodDetailFragment" />
+    </fragment>
+
 
     <fragment
         android:id="@+id/nav_preference"
         android:name="com.example.keepfresh.ui.preference.PreferenceFragment"
         android:label="@string/menu_preference"
         tools:layout="layout/fragment_preference"/>
+
+    <fragment
+        android:id="@+id/foodDetailFragment"
+        android:name="com.example.keepfresh.ui.foodInventory.FoodDetailFragment"
+        tools:layout="@layout/fragment_detail_food">
+        <argument
+            android:name="foodId"
+            app:argType="long"/>
+    </fragment>
 </navigation>
