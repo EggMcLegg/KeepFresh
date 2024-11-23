@@ -1,10 +1,12 @@
 package com.example.keepfresh.ui.foodInput
 
+import BarcodeScannerDialogFragment
 import android.app.Activity
 import android.app.DatePickerDialog
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -59,6 +61,7 @@ class FoodInputFragment : Fragment(), FoodPhotoDialogFragment.FoodPhotoListener,
 
         setupUI()
         setupPhotoResultLauncher()
+        setupBarcodeResultListener()
 
         return root
     }
@@ -90,9 +93,12 @@ class FoodInputFragment : Fragment(), FoodPhotoDialogFragment.FoodPhotoListener,
             clearInputs()
         }
 
-        binding.barcodeIcon.setOnClickListener{
-            // handle barcode here
-        }
+            binding.barcodeIcon.setOnClickListener {
+                Util.checkPermissions(requireActivity())
+                val barcodeFragment = BarcodeScannerDialogFragment()
+                barcodeFragment.show(childFragmentManager, "BarcodeScannerDialogFragment")
+            }
+
 
         binding.testApiButton.setOnClickListener {
             testFetchProductDetails()
@@ -153,6 +159,17 @@ class FoodInputFragment : Fragment(), FoodPhotoDialogFragment.FoodPhotoListener,
     private fun testFetchProductDetails() {
         val testBarcode = "737628064502" // Replace this with a valid barcode for your API
         fetchProductDetails(testBarcode)
+    }
+
+    private fun setupBarcodeResultListener() {
+        // Listen for barcode scan results
+        childFragmentManager.setFragmentResultListener("barcode_result", viewLifecycleOwner) { _, bundle ->
+            val barcode = bundle.getString("barcode")
+            barcode?.let {
+                Log.d("FoodInputFragment", "Scanned Barcode: $it")
+                fetchProductDetails(it) // Use the scanned barcode to fetch product details
+            }
+        }
     }
 
     private fun fetchProductDetails(barcode: String){
