@@ -13,6 +13,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import com.example.keepfresh.R
 import com.example.keepfresh.Util
 import com.example.keepfresh.Util.formatDate
 import com.example.keepfresh.data.FoodDatabase
@@ -21,6 +22,7 @@ import com.example.keepfresh.data.FoodItem
 import com.example.keepfresh.data.FoodRepository
 import com.example.keepfresh.databinding.FragmentDetailFoodBinding
 import com.example.keepfresh.ui.foodInput.FoodPhotoDialogFragment
+import com.squareup.picasso.Picasso
 import java.util.Calendar
 
 class FoodDetailFragment: Fragment() {
@@ -63,7 +65,15 @@ class FoodDetailFragment: Fragment() {
         foodDetailViewModel.getFoodItemById(foodId).observe(viewLifecycleOwner) { foodItem ->
             foodItem?.let{
                 photoUri = Uri.parse(it.getFoodPhotoUri())
-                binding.photoFood.setImageURI(photoUri)
+                if (photoUri != null) {
+                    Picasso.get()
+                        .load(photoUri.toString())
+                        .placeholder(R.drawable.ic_placeholder)
+                        .error(R.drawable.ic_error)
+                        .into(binding.photoFood)
+                } else {
+                    binding.photoFood.setImageResource(R.drawable.ic_placeholder) // Default placeholder
+                }
                 binding.foodNameInput.setText(it.getFoodName())
                 binding.expirationDateInput.setText(formatDate(foodItem.getExpirationDate()))
             }

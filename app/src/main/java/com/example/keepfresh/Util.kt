@@ -102,6 +102,9 @@ object Util {
         enum class ImageSource {
             GALLERY, CAMERA
         }
+        fun setPhotoUri(uri: Uri?) {
+            photoUri = uri
+        }
 
         fun getPhotoUri(): Uri? = photoUri
 
