@@ -100,9 +100,9 @@ class FoodInputFragment : Fragment(), FoodPhotoDialogFragment.FoodPhotoListener,
             }
 
 
-        binding.testApiButton.setOnClickListener {
-            testFetchProductDetails()
-        }
+//        binding.testApiButton.setOnClickListener {
+//            testFetchProductDetails()
+//        }
 
     }
 
@@ -129,13 +129,14 @@ class FoodInputFragment : Fragment(), FoodPhotoDialogFragment.FoodPhotoListener,
         foodNameInput.text?.clear()
         expirationDateInput.text?.clear()
         photoFood.setImageURI(null)
-        ImagePickerHelper.getPhotoUri()?.let { Uri.EMPTY }
+        photoFood.setImageResource(R.drawable.ic_placeholder)
+        ImagePickerHelper.setPhotoUri(Uri.EMPTY)
     }
 
     private fun setupPhotoResultLauncher() {
         photoResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
             if (result.resultCode == Activity.RESULT_OK) {
-                binding.photoFood.setImageURI(ImagePickerHelper.getPhotoUri())
+                photoFood.setImageURI(ImagePickerHelper.getPhotoUri())
             } else {
                 Toast.makeText(requireContext(), "Failed to select or capture image", Toast.LENGTH_SHORT).show()
             }
@@ -156,10 +157,10 @@ class FoodInputFragment : Fragment(), FoodPhotoDialogFragment.FoodPhotoListener,
         calendar.set(year, month, dayOfMonth)
     }
 
-    private fun testFetchProductDetails() {
-        val testBarcode = "737628064502" // Replace this with a valid barcode for your API
-        fetchProductDetails(testBarcode)
-    }
+//    private fun testFetchProductDetails() {
+//        val testBarcode = "737628064502"
+//        fetchProductDetails(testBarcode)
+//    }
 
     private fun setupBarcodeResultListener() {
         // Listen for barcode scan results
@@ -172,7 +173,7 @@ class FoodInputFragment : Fragment(), FoodPhotoDialogFragment.FoodPhotoListener,
         }
     }
 
-    private fun fetchProductDetails(barcode: String){
+    private fun fetchProductDetails(barcode: String) {
         foodInputViewModel.fetchFoodDetailsFromBarcode(barcode)
         foodInputViewModel.scannedFoodItem.observe(viewLifecycleOwner) { foodItem ->
             if (foodItem != null) {
@@ -180,7 +181,7 @@ class FoodInputFragment : Fragment(), FoodPhotoDialogFragment.FoodPhotoListener,
                 calendar.timeInMillis = foodItem.getExpirationDate()
                 expirationDateInput.setText(Util.formatDate(calendar.timeInMillis))
 
-                foodItem.getFoodPhotoUri().let { photoUri ->
+                foodItem.getFoodPhotoUri()?.takeIf { it.isNotEmpty() }?.let { photoUri ->
                     // Update ImageView with the fetched photo URI
                     ImagePickerHelper.setPhotoUri(Uri.parse(photoUri))
                     Picasso.get()
@@ -188,7 +189,12 @@ class FoodInputFragment : Fragment(), FoodPhotoDialogFragment.FoodPhotoListener,
                         .placeholder(R.drawable.ic_placeholder)
                         .error(R.drawable.ic_error)
                         .into(photoFood)
+                } ?: run {
+                    // If the URI is null or empty, set a default placeholder image
+                    photoFood.setImageResource(R.drawable.ic_placeholder)
+                    Log.w("FoodInputFragment", "Photo URI is empty or null")
                 }
+
                 Toast.makeText(requireContext(), "Product details loaded!", Toast.LENGTH_SHORT).show()
             } else {
                 Toast.makeText(requireContext(), "Failed to fetch food details", Toast.LENGTH_SHORT).show()
