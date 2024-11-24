@@ -116,7 +116,13 @@
             android:text="@string/btn_cancel">
         </Button>
     </LinearLayout>
-
+<!--    <Button-->
+<!--        android:id="@+id/testApiButton"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="Test API"-->
+<!--        android:layout_marginTop="16dp"-->
+<!--        android:visibility="visible" />-->
 
 </LinearLayout>
 

@@ -1,9 +1,13 @@
 package com.example.keepfresh.ui.foodInventory
 
+import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.example.keepfresh.R
+import com.example.keepfresh.Util.formatDate
 import com.example.keepfresh.data.FoodItem
 import com.example.keepfresh.databinding.ItemsFoodDisplayBinding
 import com.squareup.picasso.Picasso
@@ -27,11 +31,9 @@ class FoodInventoryAdapter(private val foodItems: List<FoodItem>)
                 .placeholder(R.drawable.ic_placeholder)
                 .error(R.drawable.ic_error)
                 .into(binding.foodImage)
-        }
 
-        private fun formatDate(date: Long): String{
-            val dateFormat = SimpleDateFormat("yyyy/MM/dd", Locale.getDefault())
-            return dateFormat.format(Date(date))
+            // Click listener
+
         }
     }
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FoodInventoryViewHolder {
@@ -42,7 +44,12 @@ class FoodInventoryAdapter(private val foodItems: List<FoodItem>)
     }
 
     override fun onBindViewHolder(holder: FoodInventoryViewHolder, position: Int) {
-        holder.bind(foodItems[position])
+        val foodItem = foodItems[position]
+        holder.bind(foodItem)
+        holder.itemView.setOnClickListener{
+            val action = FoodInventoryFragmentDirections.actionFoodInventoryFragmentToFoodDetailFragment(foodItem.getId())
+            holder.itemView.findNavController().navigate(action)
+        }
     }
 
     override fun getItemCount(): Int = foodItems.size

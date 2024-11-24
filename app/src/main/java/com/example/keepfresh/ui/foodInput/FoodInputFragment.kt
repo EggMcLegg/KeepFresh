@@ -1,34 +1,35 @@
 package com.example.keepfresh.ui.foodInput
 
+import BarcodeScannerDialogFragment
 import android.app.Activity
 import android.app.DatePickerDialog
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.provider.MediaStore
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.DatePicker
+import android.widget.EditText
+import android.widget.ImageView
+import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import android.widget.Toast
-import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import com.example.keepfresh.R
 import com.example.keepfresh.Util
+import com.example.keepfresh.Util.ImagePickerHelper
+import com.example.keepfresh.Util.ImagePickerHelper.ImageSource
 import com.example.keepfresh.databinding.FragmentInputBinding
 import com.example.keepfresh.data.FoodDatabase
 import com.example.keepfresh.data.FoodDatabaseDao
 import com.example.keepfresh.data.FoodItem
 import com.example.keepfresh.data.FoodRepository
-import java.io.File
-import java.io.IOException
-import java.text.SimpleDateFormat
+import com.squareup.picasso.Picasso
 import java.util.Calendar
-import java.util.Date
-import java.util.Locale
 
 class FoodInputFragment : Fragment(), FoodPhotoDialogFragment.FoodPhotoListener, DatePickerDialog.OnDateSetListener {
 
@@ -42,12 +43,13 @@ class FoodInputFragment : Fragment(), FoodPhotoDialogFragment.FoodPhotoListener,
     private lateinit var foodInputViewModel: FoodInputViewModel
 
     private lateinit var photoResultLauncher: ActivityResultLauncher<Intent>
-    private var photoUri: Uri? = null
-
     private val calendar = Calendar.getInstance()
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    private lateinit var foodNameInput: EditText
+    private lateinit var expirationDateInput: EditText
+    private lateinit var photoFood: ImageView
 
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         database = FoodDatabase.getInstance(requireContext())
         databaseDao = database.foodDatabaseDao
         repository = FoodRepository(databaseDao)
@@ -59,11 +61,19 @@ class FoodInputFragment : Fragment(), FoodPhotoDialogFragment.FoodPhotoListener,
 
         setupUI()
         setupPhotoResultLauncher()
+        setupBarcodeResultListener()
 
         return root
     }
 
-    private fun setupUI(){
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        foodNameInput = binding.inputFoodName
+        expirationDateInput = binding.inputExpirationDate
+        photoFood = binding.photoFood
+    }
+
+    private fun setupUI() {
         binding.btnChangePhoto.setOnClickListener {
             Util.checkPermissions(requireActivity())
             val dialog = FoodPhotoDialogFragment()
@@ -72,12 +82,7 @@ class FoodInputFragment : Fragment(), FoodPhotoDialogFragment.FoodPhotoListener,
         }
 
         binding.inputExpirationDate.setOnClickListener {
-            val datePickerDialog = DatePickerDialog(
-                requireContext(), this,calendar.get(Calendar.YEAR),
-                calendar.get(Calendar.MONTH),
-                calendar.get(Calendar.DAY_OF_MONTH)
-            )
-            datePickerDialog.show()
+            Util.showDatePicker(requireContext(), expirationDateInput, calendar)
         }
 
         binding.btnSave.setOnClickListener {
@@ -87,11 +92,24 @@ class FoodInputFragment : Fragment(), FoodPhotoDialogFragment.FoodPhotoListener,
         binding.btnCancel.setOnClickListener {
             clearInputs()
         }
+
+            binding.barcodeIcon.setOnClickListener {
+                Util.checkPermissions(requireActivity())
+                val barcodeFragment = BarcodeScannerDialogFragment()
+                barcodeFragment.show(childFragmentManager, "BarcodeScannerDialogFragment")
+            }
+
+
+//        binding.testApiButton.setOnClickListener {
+//            testFetchProductDetails()
+//        }
+
     }
 
-    private fun saveFoodItem(){
-        val foodName = binding.inputFoodName.text.toString()
+    private fun saveFoodItem() {
+        val foodName = foodNameInput.text.toString()
         val expirationDate = calendar.timeInMillis
+        val photoUri = ImagePickerHelper.getPhotoUri()
 
         if (foodName.isNotBlank() && photoUri != null) {
             val foodItem = FoodItem(
@@ -107,25 +125,18 @@ class FoodInputFragment : Fragment(), FoodPhotoDialogFragment.FoodPhotoListener,
         }
     }
 
-    private fun clearInputs(){
-        binding.inputFoodName.text?.clear()
-        binding.inputExpirationDate.text?.clear()
-        binding.photoFood.setImageURI(null)
-        photoUri = null
+    private fun clearInputs() {
+        foodNameInput.text?.clear()
+        expirationDateInput.text?.clear()
+        photoFood.setImageURI(null)
+        photoFood.setImageResource(R.drawable.ic_placeholder)
+        ImagePickerHelper.setPhotoUri(Uri.EMPTY)
     }
 
-    // Display Date from User Input
-    override fun onDateSet(view: DatePicker, year: Int, month: Int, dayOfMonth: Int) {
-        val selectedDate = "${year}/${month + 1}/$dayOfMonth"
-        binding.inputExpirationDate.setText(selectedDate)
-        calendar.set(year, month, dayOfMonth)
-    }
-
-    // Implement FoodPhotoListeners methods
-    private fun setupPhotoResultLauncher(){
+    private fun setupPhotoResultLauncher() {
         photoResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
             if (result.resultCode == Activity.RESULT_OK) {
-                binding.photoFood.setImageURI(photoUri)
+                photoFood.setImageURI(ImagePickerHelper.getPhotoUri())
             } else {
                 Toast.makeText(requireContext(), "Failed to select or capture image", Toast.LENGTH_SHORT).show()
             }
@@ -133,44 +144,64 @@ class FoodInputFragment : Fragment(), FoodPhotoDialogFragment.FoodPhotoListener,
     }
 
     override fun onCameraSelected() {
-        launchImageSelection(ImageSource.CAMERA)
+        ImagePickerHelper.launchImageSelection(requireContext(), ImageSource.CAMERA, photoResultLauncher)
     }
 
     override fun onGallerySelected() {
-        launchImageSelection(ImageSource.GALLERY)
+        ImagePickerHelper.launchImageSelection(requireContext(), ImageSource.GALLERY, photoResultLauncher)
     }
 
-    private fun launchImageSelection(source: ImageSource){
-        val intent = when (source) {
-            ImageSource.GALLERY -> Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-            ImageSource.CAMERA -> {
-                val photoFile = try {
-                    createImageFile()
-                } catch (ex: IOException) {
-                    Toast.makeText(requireContext(), "Error creating file", Toast.LENGTH_SHORT).show()
-                    null
-                }
-                photoFile?.let {
-                    photoUri = FileProvider.getUriForFile(requireContext(), "com.example.keepfresh.provider", photoFile)
-                    Intent(MediaStore.ACTION_IMAGE_CAPTURE).apply {
-                        putExtra(MediaStore.EXTRA_OUTPUT, photoUri)
-                    }
-                }
+    override fun onDateSet(view: DatePicker, year: Int, month: Int, dayOfMonth: Int) {
+        val selectedDate = "${year}/${month + 1}/$dayOfMonth"
+        binding.inputExpirationDate.setText(selectedDate)
+        calendar.set(year, month, dayOfMonth)
+    }
+
+//    private fun testFetchProductDetails() {
+//        val testBarcode = "737628064502"
+//        fetchProductDetails(testBarcode)
+//    }
+
+    private fun setupBarcodeResultListener() {
+        // Listen for barcode scan results
+        childFragmentManager.setFragmentResultListener("barcode_result", viewLifecycleOwner) { _, bundle ->
+            val barcode = bundle.getString("barcode")
+            barcode?.let {
+                Log.d("FoodInputFragment", "Scanned Barcode: $it")
+                fetchProductDetails(it) // Use the scanned barcode to fetch product details
             }
         }
-        intent?.let { photoResultLauncher.launch(it) }
     }
 
-    @Throws(IOException::class)
-    private fun createImageFile(): File {
-        val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
-        val storageDir: File = requireActivity().getExternalFilesDir(null)!!
-        return File.createTempFile("JPEG_${timeStamp}_", ".jpg", storageDir)
+    private fun fetchProductDetails(barcode: String) {
+        foodInputViewModel.fetchFoodDetailsFromBarcode(barcode)
+        foodInputViewModel.scannedFoodItem.observe(viewLifecycleOwner) { foodItem ->
+            if (foodItem != null) {
+                foodNameInput.setText(foodItem.getFoodName())
+                calendar.timeInMillis = foodItem.getExpirationDate()
+                expirationDateInput.setText(Util.formatDate(calendar.timeInMillis))
+
+                foodItem.getFoodPhotoUri()?.takeIf { it.isNotEmpty() }?.let { photoUri ->
+                    // Update ImageView with the fetched photo URI
+                    ImagePickerHelper.setPhotoUri(Uri.parse(photoUri))
+                    Picasso.get()
+                        .load(photoUri)
+                        .placeholder(R.drawable.ic_placeholder)
+                        .error(R.drawable.ic_error)
+                        .into(photoFood)
+                } ?: run {
+                    // If the URI is null or empty, set a default placeholder image
+                    photoFood.setImageResource(R.drawable.ic_placeholder)
+                    Log.w("FoodInputFragment", "Photo URI is empty or null")
+                }
+
+                Toast.makeText(requireContext(), "Product details loaded!", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(requireContext(), "Failed to fetch food details", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
-    private enum class ImageSource{
-        GALLERY, CAMERA
-    }
 
     override fun onDestroyView() {
         super.onDestroyView()

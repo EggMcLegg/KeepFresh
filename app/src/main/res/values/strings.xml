@@ -22,4 +22,9 @@
         <item>Months</item>
         <item>Years</item>
     </string-array>
+
+    <string name="btn_delete">DELETE</string>
+    <string name="barcode">Barcode</string>
+    <string name="cancel">Cancel</string>
+    <string name="confirm">Confirm</string>
 </resources>
