@@ -23,6 +23,13 @@
     </fragment>
 
 
+
+    <fragment
+        android:id="@+id/waste_analysis"
+        android:name="com.example.keepfresh.ui.wasteAnalysis.WasteAnalysisFragment"
+        android:label="@string/menu_waste"
+        tools:layout="@layout/fragment_waste_analysis"/>
+
     <fragment
         android:id="@+id/nav_preference"
         android:name="com.example.keepfresh.ui.preference.PreferenceFragment"
@@ -37,4 +44,5 @@
             android:name="foodId"
             app:argType="long"/>
     </fragment>
+
 </navigation>

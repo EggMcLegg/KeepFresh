@@ -11,6 +11,9 @@
             android:id="@+id/nav_inventory"
             android:title="@string/menu_inventory" />
         <item
+            android:id="@+id/waste_analysis"
+            android:title="@string/menu_waste" />
+        <item
             android:id="@+id/nav_preference"
             android:title="@string/menu_preference" />
     </group>

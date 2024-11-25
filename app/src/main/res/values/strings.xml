@@ -2,13 +2,14 @@
     <string name="app_name">KeepFresh</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="nav_header_title">Keep Fresh</string>
+    <string name="nav_header_title">KeepFresh</string>
     <string name="nav_header_desc">Navigation header</string>
 
     <!--    Navigation bar-->
     <string name="menu_input">Add Item</string>
     <string name="menu_inventory">Food Inventory</string>
     <string name="menu_preference">Notification Preference</string>
+    <string name="menu_waste">Waste Analysis</string>
 
     <!--    Fragment Input-->
     <string name="photo_food">Food Photo</string>

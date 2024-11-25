@@ -36,22 +36,39 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="16dp" />
 
-    <!-- Food Name -->
-    <EditText
-        android:id="@+id/food_name_input"
-        android:layout_width="match_parent"
+    <!-- Food Name TEXTVIEW-->
+    <TextView
+        android:id="@+id/food_name_desc"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/btn_change_photo"
         android:layout_marginTop="16dp"
         android:text="Food Name"/>
 
-    <!-- Expiration Date -->
+    <!-- Food Name -->
+    <EditText
+        android:id="@+id/food_name_input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/food_name_desc"
+        android:text="Food Name"/>
+
+    <!-- Expiration Date TEXTVIEW -->
+    <TextView
+        android:id="@+id/expiration_date_desc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/food_name_input"
+        android:layout_marginTop="16dp"
+        android:text="Expiration Date"/>
+
+    <!-- Expiration Date-->
     <EditText
         android:id="@+id/expiration_date_input"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/food_name_input"
-        android:layout_marginTop="16dp"
+        android:layout_below="@id/expiration_date_desc"
+        android:layout_marginTop="8dp"
         android:text="Expiration Date"
         android:focusable="false"
         android:clickable="true" />
