@@ -41,6 +41,10 @@ class FoodRepository (private val foodDatabaseDao: FoodDatabaseDao) {
         }
     }
 
+    fun getItemsByState(state: String): LiveData<List<FoodItem>> {
+        return foodDatabaseDao.getItemsByState(state)
+    }
+
     fun fetchFoodDetailsFromBarcode(barcode: String, onResult: (FoodItem?) -> Unit) {
         CoroutineScope(IO).launch {
             val apiURL = "$BASE_URL$barcode.json"

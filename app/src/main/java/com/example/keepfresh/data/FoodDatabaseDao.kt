@@ -24,6 +24,9 @@ interface FoodDatabaseDao {
     """)
     fun getItemsExpiringSoon(today: Long, daysLater: Long): LiveData<List<FoodItem>>
 
+    @Query("SELECT * FROM food_items_table WHERE state = :state")
+    fun getItemsByState(state: String): LiveData<List<FoodItem>>
+
     // Update the item to mark that it has been notified
     @Update
     suspend fun updateItem(item: FoodItem)

@@ -20,6 +20,15 @@ data class FoodItem (
 
     @ColumnInfo(name = "last_notified")
     private var lastNotified: Long = 0L,
+
+    @ColumnInfo(name = "state")
+    private var state: String = "",
+
+    @ColumnInfo(name = "money_spent")
+    private var moneySpent: Double = 0.0,
+
+    @ColumnInfo(name = "notification_option")
+    private var notificationOption: Boolean = false,
 ){
     // Getters
     fun getId(): Long = id
@@ -27,6 +36,9 @@ data class FoodItem (
     fun getExpirationDate(): Long = expirationDate
     fun getFoodPhotoUri(): String = foodPhotoUri
     fun getLastNotified(): Long = lastNotified
+    fun getState(): String = state
+    fun getMoneySpent(): Double = moneySpent
+    fun getNotificationOption(): Boolean = notificationOption
 
     // Setters
     fun setId(id: Long) {
@@ -49,4 +61,15 @@ data class FoodItem (
         this.lastNotified = lastNotified
     }
 
+    fun setState(state: String) {
+        this.state = state
+    }
+
+    fun setMoneySpent(moneySpent: Double) {
+        this.moneySpent = moneySpent
+    }
+
+    fun setNotificationOption(notificationOption: Boolean) {
+        this.notificationOption = notificationOption
+    }
 }
