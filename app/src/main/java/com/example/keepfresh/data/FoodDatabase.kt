@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
-@Database(entities = [FoodItem::class], version = 3, exportSchema = false)
+@Database(entities = [FoodItem::class], version = 4, exportSchema = false)
 abstract class FoodDatabase : RoomDatabase() {
     abstract val foodDatabaseDao : FoodDatabaseDao
 
@@ -19,6 +19,11 @@ abstract class FoodDatabase : RoomDatabase() {
                 db.execSQL("ALTER TABLE food_items_table ADD COLUMN notification_option INTEGER NOT NULL DEFAULT 0")
             }
         }
+        private val migration34 = object : Migration(3, 4) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE food_items_table RENAME COLUMN money_spent TO cost")
+            }
+        }
         //The Volatile keyword guarantees visibility of changes to the INSTANCE variable across threads
         @Volatile
         private var INSTANCE: FoodDatabase? = null
@@ -28,7 +33,7 @@ abstract class FoodDatabase : RoomDatabase() {
                 var instance = INSTANCE
                 if(instance == null){
                     instance = Room.databaseBuilder(context.applicationContext,
-                        FoodDatabase::class.java, "food_items_table").addMigrations(migration).build()
+                        FoodDatabase::class.java, "food_items_table").addMigrations(migration, migration34).build()
                     INSTANCE = instance
                 }
                 return instance
