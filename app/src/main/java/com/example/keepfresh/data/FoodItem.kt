@@ -24,8 +24,8 @@ data class FoodItem (
     @ColumnInfo(name = "state")
     private var state: String = "",
 
-    @ColumnInfo(name = "money_spent")
-    private var moneySpent: Double = 0.0,
+    @ColumnInfo(name = "cost")
+    private var cost: Double = 0.0,
 
     @ColumnInfo(name = "notification_option")
     private var notificationOption: Boolean = false,
@@ -37,7 +37,7 @@ data class FoodItem (
     fun getFoodPhotoUri(): String = foodPhotoUri
     fun getLastNotified(): Long = lastNotified
     fun getState(): String = state
-    fun getMoneySpent(): Double = moneySpent
+    fun getCost(): Double = cost
     fun getNotificationOption(): Boolean = notificationOption
 
     // Setters
@@ -65,8 +65,8 @@ data class FoodItem (
         this.state = state
     }
 
-    fun setMoneySpent(moneySpent: Double) {
-        this.moneySpent = moneySpent
+    fun setCost(cost: Double) {
+        this.cost = cost
     }
 
     fun setNotificationOption(notificationOption: Boolean) {
