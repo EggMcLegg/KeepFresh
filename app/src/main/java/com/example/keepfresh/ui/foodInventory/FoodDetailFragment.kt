@@ -24,6 +24,7 @@ import com.example.keepfresh.databinding.FragmentDetailFoodBinding
 import com.example.keepfresh.ui.foodInput.FoodPhotoDialogFragment
 import com.squareup.picasso.Picasso
 import java.util.Calendar
+import kotlin.math.cos
 
 class FoodDetailFragment: Fragment() {
     private var _binding: FragmentDetailFoodBinding? = null
@@ -74,8 +75,9 @@ class FoodDetailFragment: Fragment() {
                 } else {
                     binding.photoFood.setImageResource(R.drawable.ic_placeholder) // Default placeholder
                 }
-                binding.foodNameInput.setText(it.getFoodName())
+                binding.foodNameInput.setText(foodItem.getFoodName())
                 binding.expirationDateInput.setText(formatDate(foodItem.getExpirationDate()))
+                binding.costInput.setText(Util.formatPrice(foodItem.getCost()))
             }
         }
     }
@@ -86,7 +88,7 @@ class FoodDetailFragment: Fragment() {
         }
 
         binding.expirationDateInput.setOnClickListener {
-             Util.showDatePicker(requireContext(), binding.expirationDateInput, calendar)
+            Util.showDatePicker(requireContext(), binding.expirationDateInput, calendar)
         }
 
         binding.btnSave.setOnClickListener {
@@ -139,6 +141,7 @@ class FoodDetailFragment: Fragment() {
     private fun saveUpdateFoodDetails(){
         val foodName = binding.foodNameInput.text.toString()
         val expirationDate = calendar.timeInMillis
+        val price = binding.costInput.text.toString().toDoubleOrNull() ?: 0.0
         val photoUri = photoUri?.toString()
 
         if (foodName.isNotBlank() || photoUri != null ) {
@@ -146,6 +149,7 @@ class FoodDetailFragment: Fragment() {
                 id = foodId, // Keep the same ID for updates
                 foodName = foodName,
                 expirationDate = expirationDate,
+                cost = price,
                 foodPhotoUri = photoUri.toString()
             )
 

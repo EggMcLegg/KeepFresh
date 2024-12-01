@@ -81,6 +81,14 @@ object Util {
         return dateFormat.format(Date(date))
     }
 
+    fun formatPrice(price: Double?): String {
+        return if (price != null) {
+            String.format("%.2f$", price)
+        } else {
+            "0.00$"
+        }
+    }
+
     fun showDatePicker(context: Context, editText: EditText, calendar: Calendar) {
         val datePickerDialog = DatePickerDialog(
             context,

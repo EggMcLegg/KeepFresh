@@ -73,6 +73,25 @@
         android:focusable="false"
         android:clickable="true" />
 
+    <!-- Cost TEXTVIEW -->
+    <TextView
+        android:id="@+id/cost_desc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/expiration_date_input"
+        android:layout_marginTop="16dp"
+        android:text="Food Cost ($)" />
+
+    <!-- Cost Input -->
+    <EditText
+        android:id="@+id/cost_input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/cost_desc"
+        android:layout_marginTop="8dp"
+        android:inputType="numberDecimal"
+        android:text="Cost" />
+
     <!-- Save and Cancel Buttons at Bottom -->
     <LinearLayout
         android:layout_width="match_parent"

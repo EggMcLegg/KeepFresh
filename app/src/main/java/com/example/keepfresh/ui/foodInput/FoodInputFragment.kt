@@ -47,6 +47,7 @@ class FoodInputFragment : Fragment(), FoodPhotoDialogFragment.FoodPhotoListener,
 
     private lateinit var foodNameInput: EditText
     private lateinit var expirationDateInput: EditText
+    private lateinit var costInput: EditText
     private lateinit var photoFood: ImageView
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -70,6 +71,7 @@ class FoodInputFragment : Fragment(), FoodPhotoDialogFragment.FoodPhotoListener,
         super.onViewCreated(view, savedInstanceState)
         foodNameInput = binding.inputFoodName
         expirationDateInput = binding.inputExpirationDate
+        costInput = binding.inputCost
         photoFood = binding.photoFood
     }
 
@@ -93,21 +95,16 @@ class FoodInputFragment : Fragment(), FoodPhotoDialogFragment.FoodPhotoListener,
             clearInputs()
         }
 
-            binding.barcodeIcon.setOnClickListener {
-                Util.checkPermissions(requireActivity())
-                val barcodeFragment = BarcodeScannerDialogFragment()
-                barcodeFragment.show(childFragmentManager, "BarcodeScannerDialogFragment")
-            }
-
-
-//        binding.testApiButton.setOnClickListener {
-//            testFetchProductDetails()
-//        }
-
+        binding.barcodeIcon.setOnClickListener {
+            Util.checkPermissions(requireActivity())
+            val barcodeFragment = BarcodeScannerDialogFragment()
+            barcodeFragment.show(childFragmentManager, "BarcodeScannerDialogFragment")
+        }
     }
 
     private fun saveFoodItem() {
         val foodName = foodNameInput.text.toString()
+        val cost = costInput.text.toString().toDoubleOrNull() ?: 0.0
         val expirationDate = calendar.timeInMillis
         val photoUri = ImagePickerHelper.getPhotoUri()
 
@@ -115,6 +112,7 @@ class FoodInputFragment : Fragment(), FoodPhotoDialogFragment.FoodPhotoListener,
             val foodItem = FoodItem(
                 foodName = foodName,
                 expirationDate = expirationDate,
+                cost = cost,
                 foodPhotoUri = photoUri.toString()
             )
             foodInputViewModel.insert(foodItem)
@@ -128,6 +126,7 @@ class FoodInputFragment : Fragment(), FoodPhotoDialogFragment.FoodPhotoListener,
     private fun clearInputs() {
         foodNameInput.text?.clear()
         expirationDateInput.text?.clear()
+        costInput.text?.clear()
         photoFood.setImageURI(null)
         photoFood.setImageResource(R.drawable.ic_placeholder)
         ImagePickerHelper.setPhotoUri(Uri.EMPTY)
@@ -157,11 +156,6 @@ class FoodInputFragment : Fragment(), FoodPhotoDialogFragment.FoodPhotoListener,
         calendar.set(year, month, dayOfMonth)
     }
 
-//    private fun testFetchProductDetails() {
-//        val testBarcode = "737628064502"
-//        fetchProductDetails(testBarcode)
-//    }
-
     private fun setupBarcodeResultListener() {
         // Listen for barcode scan results
         childFragmentManager.setFragmentResultListener("barcode_result", viewLifecycleOwner) { _, bundle ->
@@ -182,7 +176,6 @@ class FoodInputFragment : Fragment(), FoodPhotoDialogFragment.FoodPhotoListener,
                 expirationDateInput.setText(Util.formatDate(calendar.timeInMillis))
 
                 foodItem.getFoodPhotoUri()?.takeIf { it.isNotEmpty() }?.let { photoUri ->
-                    // Update ImageView with the fetched photo URI
                     ImagePickerHelper.setPhotoUri(Uri.parse(photoUri))
                     Picasso.get()
                         .load(photoUri)
@@ -190,7 +183,6 @@ class FoodInputFragment : Fragment(), FoodPhotoDialogFragment.FoodPhotoListener,
                         .error(R.drawable.ic_error)
                         .into(photoFood)
                 } ?: run {
-                    // If the URI is null or empty, set a default placeholder image
                     photoFood.setImageResource(R.drawable.ic_placeholder)
                     Log.w("FoodInputFragment", "Photo URI is empty or null")
                 }

@@ -92,6 +92,21 @@
 
     </com.google.android.material.textfield.TextInputLayout>
 
+    <!--    Input Cost -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:hint="@string/hint_cost">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/input_cost"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="numberDecimal"/>
+
+    </com.google.android.material.textfield.TextInputLayout>
+
     <!--   Buttons -->
     <LinearLayout
         android:layout_width = "match_parent"
@@ -116,13 +131,12 @@
             android:text="@string/btn_cancel">
         </Button>
     </LinearLayout>
-<!--    <Button-->
-<!--        android:id="@+id/testApiButton"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:text="Test API"-->
-<!--        android:layout_marginTop="16dp"-->
-<!--        android:visibility="visible" />-->
+    <!--    <Button-->
+    <!--        android:id="@+id/testApiButton"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:text="Test API"-->
+    <!--        android:layout_marginTop="16dp"-->
+    <!--        android:visibility="visible" />-->
 
 </LinearLayout>
-
