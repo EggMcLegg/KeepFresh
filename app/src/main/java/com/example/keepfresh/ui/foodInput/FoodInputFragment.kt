@@ -28,6 +28,7 @@ import com.example.keepfresh.data.FoodDatabase
 import com.example.keepfresh.data.FoodDatabaseDao
 import com.example.keepfresh.data.FoodItem
 import com.example.keepfresh.data.FoodRepository
+import com.example.keepfresh.data.FoodState
 import com.squareup.picasso.Picasso
 import java.util.Calendar
 
@@ -113,6 +114,7 @@ class FoodInputFragment : Fragment(), FoodPhotoDialogFragment.FoodPhotoListener,
                 foodName = foodName,
                 expirationDate = expirationDate,
                 cost = cost,
+                state = FoodState.NOT_USED,
                 foodPhotoUri = photoUri.toString()
             )
             foodInputViewModel.insert(foodItem)
