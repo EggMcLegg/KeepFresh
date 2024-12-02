@@ -35,9 +35,13 @@ class FoodInventoryFragment : Fragment() {
         val root: View = binding.root
 
         setupRecyclerView()
-        observeData()
-
         return root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        foodInventoryViewModel.markExpiredFoodItems()
+        observeData()
     }
 
     private fun setupRecyclerView(){

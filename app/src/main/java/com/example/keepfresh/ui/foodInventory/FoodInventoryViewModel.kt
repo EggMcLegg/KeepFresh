@@ -10,6 +10,9 @@ import java.lang.IllegalArgumentException
 
 class FoodInventoryViewModel(private val repository: FoodRepository) : ViewModel() {
     val allFoodItems: LiveData<List<FoodItem>> = repository.allFoodItems.asLiveData()
+    fun markExpiredFoodItems() {
+        repository.markExpiredFoodItems()
+    }
 }
 
 class FoodInventoryViewModelFactory(private val repository: FoodRepository): ViewModelProvider.Factory{

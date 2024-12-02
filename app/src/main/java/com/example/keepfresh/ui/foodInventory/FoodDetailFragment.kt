@@ -100,7 +100,7 @@ class FoodDetailFragment: Fragment() {
                 cost.setText(Util.formatPrice(foodItem.getCost()))
                 foodState.text = foodItem.getState()
                 if(foodState.text == FoodState.EXPIRED){
-                    foodName.setTextColor(ContextCompat.getColor(requireContext(), R.color.red))
+                    foodState.setTextColor(ContextCompat.getColor(requireContext(), R.color.red))
                 }
                 setUpToggleButton(foodItem.getState())
             }

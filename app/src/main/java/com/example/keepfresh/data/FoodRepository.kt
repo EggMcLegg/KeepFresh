@@ -16,6 +16,7 @@ class FoodRepository (private val foodDatabaseDao: FoodDatabaseDao) {
     }
 
     val allFoodItems: Flow<List<FoodItem>> = foodDatabaseDao.getAllItems()
+
     fun getFoodItemById(id: Long): LiveData<FoodItem> = foodDatabaseDao.getFoodItemById(id)
 
     fun insert(foodItem: FoodItem) {
@@ -79,6 +80,20 @@ class FoodRepository (private val foodDatabaseDao: FoodDatabaseDao) {
                 onResult(null)
             } finally {
                 connection.disconnect()
+            }
+        }
+    }
+
+    fun markExpiredFoodItems(){
+        CoroutineScope(IO).launch {
+            foodDatabaseDao.getAllItems().collect { allItems ->
+                val currentTime = System.currentTimeMillis()
+                for (item in allItems) {
+                    if (item.getExpirationDate() < currentTime && item.getState() != FoodState.USED && item.getState() != FoodState.EXPIRED) {
+                        item.setState(FoodState.EXPIRED)
+                        foodDatabaseDao.updateItem(item)
+                    }
+                }
             }
         }
     }
