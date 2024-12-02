@@ -22,8 +22,6 @@
             app:destination="@id/foodDetailFragment" />
     </fragment>
 
-
-
     <fragment
         android:id="@+id/waste_analysis"
         android:name="com.example.keepfresh.ui.wasteAnalysis.WasteAnalysisFragment"

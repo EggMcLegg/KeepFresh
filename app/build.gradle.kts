@@ -66,4 +66,5 @@ dependencies {
     implementation(libs.androidx.camera.camera2)
 
     implementation (libs.picasso)
+    implementation(libs.mpandroidchart)
 }
