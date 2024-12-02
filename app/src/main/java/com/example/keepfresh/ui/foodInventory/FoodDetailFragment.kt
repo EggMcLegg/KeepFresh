@@ -7,9 +7,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
+import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
+import android.widget.ToggleButton
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
@@ -20,6 +25,7 @@ import com.example.keepfresh.data.FoodDatabase
 import com.example.keepfresh.data.FoodDatabaseDao
 import com.example.keepfresh.data.FoodItem
 import com.example.keepfresh.data.FoodRepository
+import com.example.keepfresh.data.FoodState
 import com.example.keepfresh.databinding.FragmentDetailFoodBinding
 import com.example.keepfresh.ui.foodInput.FoodPhotoDialogFragment
 import com.squareup.picasso.Picasso
@@ -40,6 +46,13 @@ class FoodDetailFragment: Fragment() {
     private lateinit var photoResultLauncher: ActivityResultLauncher<Intent>
     private var photoUri: Uri? = null
 
+    private lateinit var photoFood: ImageView
+    private lateinit var foodName: EditText
+    private lateinit var expirationDate: EditText
+    private lateinit var cost: EditText
+    private lateinit var foodState: TextView
+    private lateinit var toggleButton: ToggleButton
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         foodId = arguments?.getLong("foodId") ?: 0L
@@ -55,6 +68,14 @@ class FoodDetailFragment: Fragment() {
 
         _binding = FragmentDetailFoodBinding.inflate(inflater, container, false)
         val root: View = binding.root
+
+        photoFood = binding.photoFood
+        foodName = binding.foodNameInput
+        expirationDate = binding.expirationDateInput
+        cost = binding.costInput
+        foodState = binding.foodStatus
+        toggleButton = binding.toggleStatus
+
         showFoodItemDetails()
         setupPhotoResultLauncher()
         buttonClickListener()
@@ -70,13 +91,37 @@ class FoodDetailFragment: Fragment() {
                         .load(photoUri.toString())
                         .placeholder(R.drawable.ic_placeholder)
                         .error(R.drawable.ic_error)
-                        .into(binding.photoFood)
+                        .into(photoFood)
                 } else {
-                    binding.photoFood.setImageResource(R.drawable.ic_placeholder) // Default placeholder
+                    photoFood.setImageResource(R.drawable.ic_placeholder) // Default placeholder
                 }
-                binding.foodNameInput.setText(it.getFoodName())
-                binding.expirationDateInput.setText(formatDate(foodItem.getExpirationDate()))
+                foodName.setText(foodItem.getFoodName())
+                expirationDate.setText(formatDate(foodItem.getExpirationDate()))
+                cost.setText(foodItem.getCost().toString())
+                foodState.text = foodItem.getState()
+                if(foodState.text == FoodState.EXPIRED){
+                    foodState.setTextColor(ContextCompat.getColor(requireContext(), R.color.red))
+                }
+                setUpToggleButton(foodItem.getState())
             }
+        }
+    }
+
+    private fun setUpToggleButton(state: String){
+        when(state){
+            FoodState.NOT_USED ->  {
+                toggleButton.isEnabled = true
+                toggleButton.isChecked = false      // Marked as Used
+            }
+            FoodState.USED -> {
+                toggleButton.isEnabled = true
+                toggleButton.isChecked = true       // Marked as Not Used
+            }
+            FoodState.EXPIRED -> toggleButton.visibility = View.GONE
+        }
+        toggleButton.setOnCheckedChangeListener { _, isChecked ->
+            val newState = if (isChecked) FoodState.USED else FoodState.NOT_USED
+            foodState.text = newState
         }
     }
 
@@ -86,7 +131,7 @@ class FoodDetailFragment: Fragment() {
         }
 
         binding.expirationDateInput.setOnClickListener {
-             Util.showDatePicker(requireContext(), binding.expirationDateInput, calendar)
+            Util.showDatePicker(requireContext(), expirationDate, calendar)
         }
 
         binding.btnSave.setOnClickListener {
@@ -106,7 +151,7 @@ class FoodDetailFragment: Fragment() {
         photoResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
                 photoUri = Util.ImagePickerHelper.getPhotoUri()
-                binding.photoFood.setImageURI(photoUri)
+                photoFood.setImageURI(photoUri)
             } else {
                 Toast.makeText(requireContext(), "Failed to change photo.", Toast.LENGTH_SHORT).show()
             }
@@ -137,15 +182,19 @@ class FoodDetailFragment: Fragment() {
     }
 
     private fun saveUpdateFoodDetails(){
-        val foodName = binding.foodNameInput.text.toString()
+        val foodName = foodName.text.toString()
         val expirationDate = calendar.timeInMillis
+        val price = cost.text.toString().toDoubleOrNull() ?: 0.0
         val photoUri = photoUri?.toString()
+        val foodState = foodState.text.toString()
 
         if (foodName.isNotBlank() || photoUri != null ) {
             val foodItem = FoodItem(
                 id = foodId, // Keep the same ID for updates
                 foodName = foodName,
                 expirationDate = expirationDate,
+                cost = price,
+                state = foodState,
                 foodPhotoUri = photoUri.toString()
             )
 

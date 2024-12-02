@@ -1,9 +1,7 @@
 package com.example.keepfresh.ui.foodInventory
 
-import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.example.keepfresh.R
@@ -11,9 +9,6 @@ import com.example.keepfresh.Util.formatDate
 import com.example.keepfresh.data.FoodItem
 import com.example.keepfresh.databinding.ItemsFoodDisplayBinding
 import com.squareup.picasso.Picasso
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 class FoodInventoryAdapter(private val foodItems: List<FoodItem>)
     : RecyclerView.Adapter<FoodInventoryAdapter.FoodInventoryViewHolder>() {
@@ -32,8 +27,7 @@ class FoodInventoryAdapter(private val foodItems: List<FoodItem>)
                 .error(R.drawable.ic_error)
                 .into(binding.foodImage)
 
-            // Click listener
-
+            binding.foodState.text = foodItem.getState()
         }
     }
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FoodInventoryViewHolder {

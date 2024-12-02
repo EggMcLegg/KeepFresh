@@ -16,6 +16,7 @@
     <string name="btn_change_photo">Change</string>
     <string name="hint_food_name">Enter Food Name</string>
     <string name="hint_expiration_date">Enter Expiration Date</string>
+    <string name="hint_cost">Enter Food Cost ($)</string>
     <string name="btn_save">Save</string>
     <string name="btn_cancel">Cancel</string>
     <string-array name="time_units">
