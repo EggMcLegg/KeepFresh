@@ -97,7 +97,7 @@ class FoodDetailFragment: Fragment() {
                 }
                 foodName.setText(foodItem.getFoodName())
                 expirationDate.setText(formatDate(foodItem.getExpirationDate()))
-                cost.setText(Util.formatPrice(foodItem.getCost()))
+                cost.setText(foodItem.getCost().toString())
                 foodState.text = foodItem.getState()
                 if(foodState.text == FoodState.EXPIRED){
                     foodState.setTextColor(ContextCompat.getColor(requireContext(), R.color.red))
