@@ -43,4 +43,8 @@ interface FoodDatabaseDao {
 
     @Query("DELETE FROM food_items_table WHERE id = :foodId")
     suspend fun deleteFoodItemById(foodId: Long)
+
+    // Background Notifications
+    @Query("SELECT * FROM food_items_table WHERE expiration_date BETWEEN :today AND :daysLater")
+    suspend fun getExpiringItems(today: Long, daysLater: Long): List<FoodItem>
 }

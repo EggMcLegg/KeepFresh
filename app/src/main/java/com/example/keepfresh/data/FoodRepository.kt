@@ -49,6 +49,11 @@ class FoodRepository (private val foodDatabaseDao: FoodDatabaseDao) {
         return foodDatabaseDao.getFoodItemsByName(query)
     }
 
+    // Background Notification
+    suspend fun getExpiringItems(today: Long, daysLater: Long): List<FoodItem> {
+        return foodDatabaseDao.getExpiringItems(today, daysLater)
+    }
+
     fun fetchFoodDetailsFromBarcode(barcode: String, onResult: (FoodItem?) -> Unit) {
         CoroutineScope(IO).launch {
             val apiURL = "$BASE_URL$barcode.json"
