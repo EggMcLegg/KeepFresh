@@ -20,6 +20,7 @@ import com.example.keepfresh.data.FoodDatabase
 import com.example.keepfresh.data.FoodRepository
 import com.example.keepfresh.data.FoodItem
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import java.util.*
 
@@ -31,14 +32,24 @@ class PreferenceViewModel(application: android.app.Application) : AndroidViewMod
     init {
         val foodDao = FoodDatabase.getInstance(application).foodDatabaseDao
         foodRepository = FoodRepository(foodDao)
+    }
 
-        //val today = System.currentTimeMillis()
-        //val totalDaysLater = today + (daysLater * 24 * 60 * 60 * 1000)  // 3 days in milliseconds
-        //expiringItems = foodRepository.getExpiringItemsSoon(today, totalDaysLater)
+    fun searchFoodItems(query: String): LiveData<List<FoodItem>> {
+        return foodRepository.getFoodItemsByName(query)
+    }
+
+    fun updateFoodItem(foodItem: FoodItem) {
+        viewModelScope.launch {
+            foodRepository.update(foodItem)
+        }
     }
 
     fun fetchExpiringItems(daysLater: Long) {
         expiringItems = foodRepository.getExpiringItemsSoon(daysLater)
+    }
+
+    fun getFoodNames(): Flow<List<FoodItem>> {
+        return foodRepository.allFoodItems
     }
 
     /**

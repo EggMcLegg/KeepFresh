@@ -64,7 +64,7 @@ dependencies {
 
     implementation(libs.mlkit.barcode.scanning)
     implementation(libs.androidx.camera.camera2)
-
+    implementation(libs.androidx.work.runtime.ktx)
     implementation (libs.picasso)
     implementation(libs.mpandroidchart)
 }

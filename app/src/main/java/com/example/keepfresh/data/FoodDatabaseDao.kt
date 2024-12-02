@@ -16,16 +16,23 @@ interface FoodDatabaseDao {
     @Query("SELECT * FROM food_items_table")
     fun getAllItems(): Flow<List<FoodItem>>
 
-    @Query("""
+    @Query(
+        """
         SELECT * FROM food_items_table 
         WHERE expiration_date  <= :daysLater 
         AND expiration_date  >= :today 
         AND (last_notified = 0 OR strftime('%Y-%m-%d', last_notified / 1000, 'unixepoch') != strftime('%Y-%m-%d', :today / 1000, 'unixepoch'))
-    """)
+        AND (notification_option = 1)
+    """
+    )
     fun getItemsExpiringSoon(today: Long, daysLater: Long): LiveData<List<FoodItem>>
 
     @Query("SELECT * FROM food_items_table WHERE state = :state")
     fun getItemsByState(state: String): LiveData<List<FoodItem>>
+
+    // Searchable Spinner
+    @Query("SELECT * FROM food_items_table WHERE food_name LIKE '%' || :query || '%'")
+    fun getFoodItemsByName(query: String): LiveData<List<FoodItem>>
 
     // Update the item to mark that it has been notified
     @Update
@@ -36,4 +43,8 @@ interface FoodDatabaseDao {
 
     @Query("DELETE FROM food_items_table WHERE id = :foodId")
     suspend fun deleteFoodItemById(foodId: Long)
+
+    // Background Notifications
+    @Query("SELECT * FROM food_items_table WHERE expiration_date BETWEEN :today AND :daysLater")
+    suspend fun getExpiringItems(today: Long, daysLater: Long): List<FoodItem>
 }
