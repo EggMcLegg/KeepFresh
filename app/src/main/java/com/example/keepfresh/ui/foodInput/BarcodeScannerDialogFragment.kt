@@ -78,7 +78,6 @@ class BarcodeScannerDialogFragment : DialogFragment() {
     private fun startCamera() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
         cameraProviderFuture.addListener(Runnable {
-            // Camera provider is now available, bind camera lifecycle
             cameraProvider = cameraProviderFuture.get()
 
             // Set up CameraX
